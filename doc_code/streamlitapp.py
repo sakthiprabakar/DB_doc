@@ -192,6 +192,9 @@ def analyze_stored_procedure(file_content):
         model_id = "anthropic.claude-3-5-sonnet-20240620-v1:0"
         
         # Create prompt for analysis
+        # Update the prompt in the analyze_stored_procedure function to better guide Claude to produce valid JSON
+# Find the prompt definition in your code and replace it with this improved version:
+
         prompt = f"""
         Analyze the following SQL stored procedure in its entirety and return your analysis in JSON format:
         
@@ -213,11 +216,16 @@ def analyze_stored_procedure(file_content):
         - Provide the COMPLETE improved code snippet with all necessary implementation details - DO NOT use ellipses or abbreviations
         - Explain the performance benefit and why this change would be impactful
         
-        EXTREMELY IMPORTANT: For both the existing and optimized code sections, provide the COMPLETE code without using "..." or any other abbreviations. Include all relevant SQL statements, variables, and contextual code required to understand both the original issue and the recommended solution.
+        EXTREMELY IMPORTANT JSON RULES:
+        1. Your response must be VALID JSON that can be parsed with standard JSON parsers
+        2. All string values must be properly escaped - backslashes before quotes in strings (\\")
+        3. Do not include any control characters (\\n, \\r) in string values
+        4. Keep string values simple - avoid complex formatting
+        5. Always make sure all JSON strings are properly closed with double quotes
+        6. Every opening quote must have a closing quote - no unterminated strings
+        7. Do not include newlines within JSON string values - use space instead
         
         Focus only on meaningful optimizations that would significantly improve performance or maintainability. Ignore minor stylistic issues like formatting, variable naming, or aliasing preferences.
-        
-        IMPORTANT: Your JSON response MUST BE VALID and properly escaped. Avoid special characters, newlines or quotes in JSON string values that could break parsing. Ensure all strings are properly closed with quotes.
         
         Structure your response as valid JSON that matches this format exactly:
         {{
@@ -228,8 +236,8 @@ def analyze_stored_procedure(file_content):
                 {{
                     "type": "type of optimization",
                     "line_number": "specific line number range (e.g., '15-20')",
-                    "existing_logic": "current code - Generate exact code that is going to be optimized",
-                    "optimized_logic": "improved code - Generate exact code that is optimized",
+                    "existing_logic": "current code - simple format with no special characters",
+                    "optimized_logic": "improved code - simple format with no special characters",
                     "explanation": "explanation of benefits"
                 }}
             ],
@@ -243,9 +251,9 @@ def analyze_stored_procedure(file_content):
         FINAL INSTRUCTIONS:
         1. Your response must contain ONLY valid JSON.
         2. Do NOT include backticks or JSON code block markers.
-        3. Keep all string values properly escaped and use simple formatting.
-        4. Keep code examples COMPLETE - do not truncate with ellipses.
-        5. Double-check that your JSON response will parse correctly before returning it.
+        3. DO NOT include newlines in JSON string values.
+        4. Keep all string values simple and properly escaped.
+        5. Check twice that every opening quote has a matching closing quote.
         6. For each optimization, always provide specific line number ranges, never general locations.
 
         Additionally use The following points involved to optimize the stored procedures and functions If found :
@@ -258,10 +266,7 @@ def analyze_stored_procedure(file_content):
         6)Instead of using * in the SELECT clause, explicitly list the columns needed.This can improve performance by fetching only the necessary columns and reducing data transfer.
         7)Minimize the usage of dynamic sql.  --- alternate for this code without any logic changes, only if the dynamic sql is used.
         8)Usage of temporary tables(using temp tables in the code will be much efficient , for ex: by replacing cursors with temp tables).
-
- 
        """
-        
         # Generate response using Claude model with retry logic
         def generate_response(prompt):
             payload = {
