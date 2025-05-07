@@ -196,76 +196,93 @@ def analyze_stored_procedure(file_content):
 # Find the prompt definition in your code and replace it with this improved version:
 
         prompt = f"""
-        Analyze the following SQL stored procedure in its entirety and return your analysis in JSON format:
-        
-        {file_content}
-        
-        You are an expert in SQL performance optimization. Thoroughly analyze the stored procedure and identify the most significant optimization opportunities specific to this code. Focus on optimizations that would result in meaningful performance improvements.
-        
-        Extract and provide:
-        1. The name of the stored procedure
-        2. The complexity level of the query that needs to be optimized
-        3. The scope/purpose of the stored procedure with details of 4-5 lines
-        4. Analyze the stored procedure line-by-line, identifying logical blocks and their performance implications. For each logical section, evaluate execution efficiency, resource usage, and potential bottlenecks. Provide specific optimization recommendations based on this detailed analysis.
-        
-        For each optimization opportunity:
-        - Provide a clear, descriptive name for the type of optimization
-        - IMPORTANT: Indicate the EXACT line number range in the code where this optimization applies (e.g., "15-20", "32-45")
-          Do NOT use generic terms like "Entire procedure" or "Throughout the procedure"
-        - Include the COMPLETE existing code snippet with context - DO NOT use ellipses or abbreviations
-        - Provide the COMPLETE improved code snippet with all necessary implementation details - DO NOT use ellipses or abbreviations
-        - Explain the performance benefit and why this change would be impactful
-        
-        EXTREMELY IMPORTANT JSON RULES:
-        1. Your response must be VALID JSON that can be parsed with standard JSON parsers
-        2. All string values must be properly escaped - backslashes before quotes in strings (\\")
-        3. Do not include any control characters (\\n, \\r) in string values
-        4. Keep string values simple - avoid complex formatting
-        5. Always make sure all JSON strings are properly closed with double quotes
-        6. Every opening quote must have a closing quote - no unterminated strings
-        7. Do not include newlines within JSON string values - use space instead
-        
-        Focus only on meaningful optimizations that would significantly improve performance or maintainability. Ignore minor stylistic issues like formatting, variable naming, or aliasing preferences.
-        
-        Structure your response as valid JSON that matches this format exactly:
-        {{
-            "procedure_name": "name of the procedure",
-            "complexity": "complexity level",
-            "scope": "brief description",
-            "optimizations": [
-                {{
-                    "type": "type of optimization",
-                    "line_number": "specific line number range (e.g., '15-20')",
-                    "existing_logic": "current code - simple format with no special characters",
-                    "optimized_logic": "improved code - simple format with no special characters",
-                    "explanation": "explanation of benefits"
-                }}
-            ],
-            "summary": {{
-                "original_performance_issues": "key issues overview",
-                "optimization_impact": "estimated impact",
-                "implementation_difficulty": "difficulty assessment"
-            }}
-        }}
-        
-        FINAL INSTRUCTIONS:
-        1. Your response must contain ONLY valid JSON.
-        2. Do NOT include backticks or JSON code block markers.
-        3. DO NOT include newlines in JSON string values.
-        4. Keep all string values simple and properly escaped.
-        5. Check twice that every opening quote has a matching closing quote.
-        6. For each optimization, always provide specific line number ranges, never general locations.
+Analyze the following SQL stored procedure in its entirety and return your analysis in JSON format:
 
-        Additionally use The following points involved to optimize the stored procedures and functions If found :
+{file_content}
+
+You are an expert in SQL performance optimization. Thoroughly analyze the stored procedure and identify the most significant optimization opportunities specific to this code. Focus on optimizations that would result in meaningful performance improvements.
+
+Extract and provide:
+1. The name of the stored procedure
+2. The complexity level of the query that needs to be optimized
+3. The scope/purpose of the stored procedure with details of 4-5 lines
+4. Analyze the stored procedure line-by-line, identifying logical blocks and their performance implications. For each logical section, evaluate execution efficiency, resource usage, and potential bottlenecks. Provide specific optimization recommendations based on this detailed analysis.
+
+For each optimization opportunity:
+- Provide a clear, descriptive name for the type of optimization
+- IMPORTANT: Indicate the EXACT line number range in the code where this optimization applies (e.g., "15-20", "32-45")
+  Do NOT use generic terms like "Entire procedure" or "Throughout the procedure"
+- Include the COMPLETE existing code snippet with context - NEVER use ellipses or abbreviations - show FULL code for the section
+- Provide the COMPLETE improved code snippet with ALL necessary implementation details - NEVER use ellipses or abbreviations - show FULL code
+- Explain the performance benefit and why this change would be impactful
+
+EXTREMELY IMPORTANT CODE SNIPPET RULES:
+1. ALWAYS provide COMPLETE code snippets showing the ENTIRE relevant section
+2. NEVER abbreviate code with ellipses (...) or similar placeholders
+3. Show the ENTIRE implementation for both existing and optimized code
+4. If code is lengthy, still include the FULL code - do not summarize or truncate any part
+5. Include ALL variable declarations, control structures, and statements in your code examples
+6. For every optimization, ensure both original and optimized code snippets are COMPLETE with no parts missing
+
+EXTREMELY IMPORTANT JSON RULES:
+1. Your response must be VALID JSON that can be parsed with standard JSON parsers
+2. All string values must be properly escaped - backslashes before quotes in strings (\\")
+3. Do not include any control characters (\\n, \\r) in string values
+4. Keep string values simple - avoid complex formatting
+5. Always make sure all JSON strings are properly closed with double quotes
+6. Every opening quote must have a closing quote - no unterminated strings
+7. Do not include newlines within JSON string values - use space instead
+
+Focus only on meaningful optimizations that would significantly improve performance or maintainability. Ignore minor stylistic issues like formatting, variable naming, or aliasing preferences.
+
+Structure your response as valid JSON that matches this format exactly:
+{
+    "procedure_name": "name of the procedure",
+    "complexity": "complexity level",
+    "scope": "brief description",
+    "optimizations": [
+        {
+            "type": "type of optimization",
+            "line_number": "specific line number range (e.g., '15-20')",
+            "existing_logic": "COMPLETE current code with NO abbreviations or ellipses",
+            "optimized_logic": "COMPLETE improved code with NO abbreviations or ellipses",
+            "explanation": "explanation of benefits"
+        }
+    ],
+    "summary": {
+        "original_performance_issues": "key issues overview",
+        "optimization_impact": "estimated impact",
+        "implementation_difficulty": "difficulty assessment"
+    }
+}
+
+CRITICAL INSTRUCTIONS ABOUT CODE SNIPPETS:
+1. Provide the COMPLETE code for each section you're addressing - NEVER truncate with ellipses
+2. If showing a cursor, include ALL declarations, OPEN, FETCH, WHILE loop, CLOSE, and DEALLOCATE statements
+3. If showing temp table creation, include ALL column definitions and constraints
+4. Include ALL logic within control structures (IF/WHILE/etc.) - never abbreviate with "..."
+5. For every code section, ensure 100% of the relevant code is displayed
+
+Additionally use The following points involved to optimize the stored procedures and functions If found:
  
-        1)Identify the Index Usage and Removal of Unused Indices.
-        2)Removal of Redundant Usage of Distinct and Union(Alternate for this without any changes in the original logic).
-        3)Utilize set-based operations for inserts where possible, which is generally more efficient than row-by-row processing.
-        4)It's not necessary to use NOCOUNT on and off multiple times. Instead, set it on at the beginning and off at the end of the stored procedure.
-        5)Replace the nested loops with a Common Table Expression (CTE) for parsing the comma-separated values.
-        6)Instead of using * in the SELECT clause, explicitly list the columns needed.This can improve performance by fetching only the necessary columns and reducing data transfer.
-        7)Minimize the usage of dynamic sql.  --- alternate for this code without any logic changes, only if the dynamic sql is used.
-        8)Usage of temporary tables(using temp tables in the code will be much efficient , for ex: by replacing cursors with temp tables).
+1) Identify the Index Usage and Removal of Unused Indices.
+2) Removal of Redundant Usage of Distinct and Union (Alternate for this without any changes in the original logic).
+3) Utilize set-based operations for inserts where possible, which is generally more efficient than row-by-row processing.
+4) It's not necessary to use NOCOUNT on and off multiple times. Instead, set it on at the beginning and off at the end of the stored procedure.
+5) Replace the nested loops with a Common Table Expression (CTE) for parsing the comma-separated values.
+6) Instead of using * in the SELECT clause, explicitly list the columns needed. This can improve performance by fetching only the necessary columns and reducing data transfer.
+7) Minimize the usage of dynamic sql. --- alternate for this code without any logic changes, only if the dynamic sql is used.
+8) Usage of temporary tables (using temp tables in the code will be much efficient, for ex: by replacing cursors with temp tables).
+
+FINAL INSTRUCTIONS:
+1. Your response must contain ONLY valid JSON.
+2. Do NOT include backticks or JSON code block markers.
+3. DO NOT include newlines in JSON string values.
+4. Keep all string values simple and properly escaped.
+5. Check twice that every opening quote has a matching closing quote.
+6. For each optimization, always provide specific line number ranges, never general locations.
+7. NEVER use ellipses (...) or any other form of abbreviation in code examples.
+8. Always show the COMPLETE code for each section being optimized.
        """
         # Generate response using Claude model with retry logic
         def generate_response(prompt):
