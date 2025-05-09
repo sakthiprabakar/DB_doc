@@ -2,3 +2,4 @@ streamlit
 pandas
 boto3
 python-docx
+demjson3
